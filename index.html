@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Tattoo Wisdom</title>
+  <title>The Words of the Tattoo</title>
   <style>
     body {
       background: #111;
@@ -48,6 +48,10 @@
     button:hover {
       background: #666;
     }
+    #notice {
+      margin-top: 15px;
+      color: #ffcc00;
+    }
   </style>
 </head>
 <body>
@@ -57,7 +61,7 @@
   </div>
 
   <textarea id="editor"></textarea>
-  <button id="saveBtn" onclick="saveText()">Save</button>
+  <button id="saveBtn" onclick="saveText()">Save & Download</button>
 
   <p id="notice"></p>
 
@@ -75,14 +79,34 @@
       editor.style.display = "block";
       saveBtn.style.display = "inline-block";
       editor.value = contentDiv.innerText;
-      notice.innerText = "⚠️ Remember to download and re-upload this file after editing to make changes permanent.";
+      notice.innerText = "⚠️ Your changes are only saved after re-uploading the downloaded file.";
     }
 
     function saveText() {
       const newText = editor.value;
       contentDiv.innerText = newText;
-      alert("Text updated! But remember: download this HTML file and re-upload it to make changes permanent.");
+
+      // Get current HTML
+      let html = document.documentElement.outerHTML;
+      // Replace old text with new text in HTML
+      html = html.replace(/<div id=\"content\">[\\s\\S]*?<\\/div>/, `<div id="content">${newText}</div>`);
+
+      // Create a blob of the new HTML
+      const blob = new Blob([html], { type: "text/html" });
+      const url = URL.createObjectURL(blob);
+
+      // Create a link to download
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "index.html";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      alert("✅ Updated HTML downloaded! Upload this file to GitHub to make changes live.");
     }
   </script>
 </body>
 </html>
+
