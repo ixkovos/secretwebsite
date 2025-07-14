@@ -60,7 +60,6 @@
 <body>
   <div id="loginSection">
     <h2>Enter Password</h2>
-    <label for="passwordInput">Password:</label>
     <input type="password" id="passwordInput" placeholder="Enter password" />
     <span id="togglePassword">👁️</span>
     <button id="loginBtn">Enter</button>
@@ -98,16 +97,13 @@
         togglePassword.textContent = passwordInput.type === "password" ? "👁️" : "🙈";
       });
 
-      // Unlock admin mode
+      // Unlock admin
       function unlockAdmin() {
         const entered = passwordInput.value.trim();
-        if (entered === correctPassword) {
+        if (entered.toLowerCase() === correctPassword.toLowerCase()) {
           loginSection.style.display = "none";
-          mainContent.style.display = "flex"; // maintain flex layout
-          editor.style.display = "block";
-          saveBtn.style.display = "inline-block";
-          notice.style.display = "block";
-          editor.value = displayText.innerHTML; // preserve line breaks
+          mainContent.style.display = "block";
+          editor.value = displayText.innerText;
           notice.innerText = "⚠️ Changes only saved after re-uploading the downloaded file.";
         } else {
           errorMsg.textContent = "❌ Wrong password. Try again.";
@@ -123,22 +119,10 @@
       // Save & download updated HTML
       saveBtn.addEventListener("click", () => {
         const newText = editor.value;
-
-        // Escape HTML entities
-        const escapedText = newText
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")
-          .replace(/"/g, "&quot;")
-          .replace(/'/g, "&#039;");
-
-        displayText.innerHTML = escapedText;
+        displayText.innerText = newText;
 
         let html = document.documentElement.outerHTML;
-        html = html.replace(
-          /<div id="displayText">[\s\S]*?<\/div>/,
-          `<div id="displayText">${escapedText}</div>`
-        );
+        html = html.replace(/<div id="displayText">[\\s\\S]*?<\\/div>/, `<div id="displayText">${newText}</div>`);
 
         const blob = new Blob([html], { type: "text/html" });
         const url = URL.createObjectURL(blob);
@@ -156,3 +140,4 @@
   </script>
 </body>
 </html>
+
