@@ -75,58 +75,60 @@
   <p id="notice"></p>
 
   <script>
-    const editPassword = "qrpass2025";
+    document.addEventListener("DOMContentLoaded", function () {
+      const editPassword = "qrpass2025";
 
-    const passwordSection = document.getElementById("passwordSection");
-    const title = document.getElementById("title");
-    const contentDiv = document.getElementById("content");
-    const editor = document.getElementById("editor");
-    const saveBtn = document.getElementById("saveBtn");
-    const notice = document.getElementById("notice");
-    const errorMsg = document.getElementById("errorMsg");
-    const passwordInput = document.getElementById("passwordInput");
-    const togglePassword = document.getElementById("togglePassword");
+      const passwordSection = document.getElementById("passwordSection");
+      const title = document.getElementById("title");
+      const contentDiv = document.getElementById("content");
+      const editor = document.getElementById("editor");
+      const saveBtn = document.getElementById("saveBtn");
+      const notice = document.getElementById("notice");
+      const errorMsg = document.getElementById("errorMsg");
+      const passwordInput = document.getElementById("passwordInput");
+      const togglePassword = document.getElementById("togglePassword");
 
-    function unlockAdmin() {
-      const enteredPassword = passwordInput.value.trim();
-      if (enteredPassword.toLowerCase() === editPassword.toLowerCase()) {
-        passwordSection.style.display = "none";
-        title.style.display = "block";
-        contentDiv.style.display = "block";
-        editor.style.display = "block";
-        saveBtn.style.display = "inline-block";
-        notice.style.display = "block";
-        editor.value = contentDiv.innerText;
-        notice.innerText = "⚠️ Changes are only saved after re-uploading the downloaded file.";
-      } else {
-        errorMsg.innerText = "❌ Wrong password. Try again.";
+      function unlockAdmin() {
+        const enteredPassword = passwordInput.value.trim();
+        if (enteredPassword.toLowerCase() === editPassword.toLowerCase()) {
+          passwordSection.style.display = "none";
+          title.style.display = "block";
+          contentDiv.style.display = "block";
+          editor.style.display = "block";
+          saveBtn.style.display = "inline-block";
+          notice.style.display = "block";
+          editor.value = contentDiv.innerText;
+          notice.innerText = "⚠️ Changes are only saved after re-uploading the downloaded file.";
+        } else {
+          errorMsg.innerText = "❌ Wrong password. Try again.";
+        }
       }
-    }
 
-    // Unlock on button click
-    document.getElementById("enterBtn").addEventListener("click", unlockAdmin);
+      // Unlock on button click
+      document.getElementById("enterBtn").addEventListener("click", unlockAdmin);
 
-    // Unlock on Enter key press
-    passwordInput.addEventListener("keypress", function(event) {
-      if (event.key === "Enter") {
-        unlockAdmin();
-      }
-    });
+      // Unlock on Enter key press
+      passwordInput.addEventListener("keydown", function(event) {
+        if (event.key === "Enter") {
+          unlockAdmin();
+        }
+      });
 
-    // Toggle password visibility
-    togglePassword.addEventListener("click", () => {
-      if (passwordInput.type === "password") {
-        passwordInput.type = "text";
-        togglePassword.textContent = "🙈";
-      } else {
-        passwordInput.type = "password";
-        togglePassword.textContent = "👁️";
-      }
+      // Toggle password visibility
+      togglePassword.addEventListener("click", () => {
+        if (passwordInput.type === "password") {
+          passwordInput.type = "text";
+          togglePassword.textContent = "🙈";
+        } else {
+          passwordInput.type = "password";
+          togglePassword.textContent = "👁️";
+        }
+      });
     });
 
     function saveText() {
-      const newText = editor.value;
-      contentDiv.innerText = newText;
+      const newText = document.getElementById("editor").value;
+      document.getElementById("content").innerText = newText;
 
       let html = document.documentElement.outerHTML;
       html = html.replace(/<div id="content">[\\s\\S]*?<\\/div>/, `<div id="content">${newText}</div>`);
@@ -146,4 +148,3 @@
   </script>
 </body>
 </html>
-
