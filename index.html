@@ -21,18 +21,12 @@
     h1, h2 {
       margin-bottom: 20px;
     }
-    #content {
-      font-size: 1.2em;
-      max-width: 600px;
-      line-height: 1.6;
-      margin-bottom: 20px;
-    }
-    #editor, #saveBtn {
+    #content, #editor, #saveBtn, #notice {
       display: none;
-      width: 90%;
-      max-width: 600px;
     }
     #editor {
+      width: 90%;
+      max-width: 600px;
       height: 200px;
       margin-bottom: 10px;
     }
@@ -59,14 +53,7 @@
   </style>
 </head>
 <body>
-  <h1>The Words of the Tattoo</h1>
-
-  <!-- Public content -->
-  <div id="content">
-    This is the initial tattoo text. Tattoo guy can change it in admin mode.
-  </div>
-
-  <!-- Password section -->
+  <!-- Password Section -->
   <div id="passwordSection">
     <h2>Enter Password</h2>
     <input type="password" id="passwordInput" placeholder="Enter password" />
@@ -74,7 +61,11 @@
     <p id="errorMsg"></p>
   </div>
 
-  <!-- Admin panel -->
+  <!-- Hidden Content -->
+  <h1 id="title">The Words of the Tattoo</h1>
+  <div id="content">
+    This is the initial tattoo text. Tattoo guy can change it in admin mode.
+  </div>
   <textarea id="editor"></textarea>
   <button id="saveBtn" onclick="saveText()">Save & Download</button>
   <p id="notice"></p>
@@ -83,6 +74,7 @@
     const editPassword = "qrpass2025";
 
     const passwordSection = document.getElementById("passwordSection");
+    const title = document.getElementById("title");
     const contentDiv = document.getElementById("content");
     const editor = document.getElementById("editor");
     const saveBtn = document.getElementById("saveBtn");
@@ -95,9 +87,12 @@
       if (enteredPassword.toLowerCase() === editPassword.toLowerCase()) {
         // Unlock admin mode
         passwordSection.style.display = "none";
+        title.style.display = "block";
+        contentDiv.style.display = "block";
         editor.style.display = "block";
         saveBtn.style.display = "inline-block";
         editor.value = contentDiv.innerText;
+        notice.style.display = "block";
         notice.innerText = "⚠️ Your changes are only saved after re-uploading the downloaded file.";
       } else {
         errorMsg.innerText = "❌ Wrong password. Try again.";
@@ -127,5 +122,7 @@
     }
   </script>
 </body>
+</html>
+
 </html>
 
