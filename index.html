@@ -68,7 +68,7 @@
   <script>
     const urlParams = new URLSearchParams(window.location.search);
     const editPassword = "qrpass2025";
-    const isAdmin = urlParams.get("edit") === editPassword;
+   if (enteredPassword.toLowerCase() === editPassword.toLowerCase())
 
     const contentDiv = document.getElementById("content");
     const editor = document.getElementById("editor");
