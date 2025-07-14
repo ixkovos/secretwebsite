@@ -21,7 +21,7 @@
     h1, h2 {
       margin-bottom: 20px;
     }
-    #title, #content, #editor, #saveBtn, #notice {
+    #mainContent, #editor, #saveBtn, #notice {
       display: none;
     }
     #editor {
@@ -58,93 +58,85 @@
   </style>
 </head>
 <body>
-  <div id="passwordSection">
+  <div id="loginSection">
     <h2>Enter Password</h2>
     <input type="password" id="passwordInput" placeholder="Enter password" />
     <span id="togglePassword">👁️</span>
-    <button id="enterBtn">Enter</button>
+    <button id="loginBtn">Enter</button>
     <p id="errorMsg"></p>
   </div>
 
-  <h1 id="title">The Words of the Tattoo</h1>
-  <div id="content">
-    This is the initial tattoo text. Tattoo guy can change it in admin mode.
+  <div id="mainContent">
+    <h1>The Words of the Tattoo</h1>
+    <div id="displayText">
+      This is the initial tattoo text. Tattoo guy can change it in admin mode.
+    </div>
+    <textarea id="editor"></textarea>
+    <button id="saveBtn">Save & Download</button>
+    <p id="notice"></p>
   </div>
-  <textarea id="editor"></textarea>
-  <button id="saveBtn" onclick="saveText()">Save & Download</button>
-  <p id="notice"></p>
 
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const editPassword = "qrpass2025";
+    document.addEventListener("DOMContentLoaded", () => {
+      const correctPassword = "qrpass2025";
 
-      const passwordSection = document.getElementById("passwordSection");
-      const title = document.getElementById("title");
-      const contentDiv = document.getElementById("content");
+      const loginSection = document.getElementById("loginSection");
+      const mainContent = document.getElementById("mainContent");
+      const passwordInput = document.getElementById("passwordInput");
+      const togglePassword = document.getElementById("togglePassword");
+      const loginBtn = document.getElementById("loginBtn");
+      const errorMsg = document.getElementById("errorMsg");
+      const displayText = document.getElementById("displayText");
       const editor = document.getElementById("editor");
       const saveBtn = document.getElementById("saveBtn");
       const notice = document.getElementById("notice");
-      const errorMsg = document.getElementById("errorMsg");
-      const passwordInput = document.getElementById("passwordInput");
-      const togglePassword = document.getElementById("togglePassword");
-
-      function unlockAdmin() {
-        const enteredPassword = passwordInput.value.trim();
-        if (enteredPassword.toLowerCase() === editPassword.toLowerCase()) {
-          passwordSection.style.display = "none";
-          title.style.display = "block";
-          contentDiv.style.display = "block";
-          editor.style.display = "block";
-          saveBtn.style.display = "inline-block";
-          notice.style.display = "block";
-          editor.value = contentDiv.innerText;
-          notice.innerText = "⚠️ Changes are only saved after re-uploading the downloaded file.";
-        } else {
-          errorMsg.innerText = "❌ Wrong password. Try again.";
-        }
-      }
-
-      // Unlock on button click
-      document.getElementById("enterBtn").addEventListener("click", unlockAdmin);
-
-      // Unlock on Enter key press
-      passwordInput.addEventListener("keydown", function(event) {
-        if (event.key === "Enter") {
-          unlockAdmin();
-        }
-      });
 
       // Toggle password visibility
       togglePassword.addEventListener("click", () => {
-        if (passwordInput.type === "password") {
-          passwordInput.type = "text";
-          togglePassword.textContent = "🙈";
+        passwordInput.type = passwordInput.type === "password" ? "text" : "password";
+        togglePassword.textContent = passwordInput.type === "password" ? "👁️" : "🙈";
+      });
+
+      // Unlock admin
+      function unlockAdmin() {
+        const entered = passwordInput.value.trim();
+        if (entered.toLowerCase() === correctPassword.toLowerCase()) {
+          loginSection.style.display = "none";
+          mainContent.style.display = "block";
+          editor.value = displayText.innerText;
+          notice.innerText = "⚠️ Changes only saved after re-uploading the downloaded file.";
         } else {
-          passwordInput.type = "password";
-          togglePassword.textContent = "👁️";
+          errorMsg.textContent = "❌ Wrong password. Try again.";
         }
+      }
+
+      // Enter key or button click unlocks
+      loginBtn.addEventListener("click", unlockAdmin);
+      passwordInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") unlockAdmin();
+      });
+
+      // Save & download updated HTML
+      saveBtn.addEventListener("click", () => {
+        const newText = editor.value;
+        displayText.innerText = newText;
+
+        let html = document.documentElement.outerHTML;
+        html = html.replace(/<div id="displayText">[\\s\\S]*?<\\/div>/, `<div id="displayText">${newText}</div>`);
+
+        const blob = new Blob([html], { type: "text/html" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "index.html";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        alert("✅ Downloaded! Upload to GitHub to make it live.");
       });
     });
-
-    function saveText() {
-      const newText = document.getElementById("editor").value;
-      document.getElementById("content").innerText = newText;
-
-      let html = document.documentElement.outerHTML;
-      html = html.replace(/<div id="content">[\\s\\S]*?<\\/div>/, `<div id="content">${newText}</div>`);
-
-      const blob = new Blob([html], { type: "text/html" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "index.html";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-
-      alert("✅ Updated HTML downloaded! Upload this file to GitHub to make changes live.");
-    }
   </script>
 </body>
 </html>
