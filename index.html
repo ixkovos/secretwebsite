@@ -13,12 +13,12 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 100vh;
+      min-height: 100vh;
       margin: 0;
       padding: 20px;
       text-align: center;
     }
-    h1 {
+    h1, h2 {
       margin-bottom: 20px;
     }
     #content {
@@ -52,50 +52,69 @@
       margin-top: 15px;
       color: #ffcc00;
     }
+    #errorMsg {
+      color: red;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
   <h1>The Words of the Tattoo</h1>
+
+  <!-- Public content -->
   <div id="content">
     This is the initial tattoo text. Tattoo guy can change it in admin mode.
   </div>
 
+  <!-- Password section -->
+  <div id="passwordSection">
+    <h2>Enter Password</h2>
+    <input type="password" id="passwordInput" placeholder="Enter password" />
+    <button id="enterBtn">Enter</button>
+    <p id="errorMsg"></p>
+  </div>
+
+  <!-- Admin panel -->
   <textarea id="editor"></textarea>
   <button id="saveBtn" onclick="saveText()">Save & Download</button>
-
   <p id="notice"></p>
 
   <script>
-    const urlParams = new URLSearchParams(window.location.search);
     const editPassword = "qrpass2025";
-   if (enteredPassword.toLowerCase() === editPassword.toLowerCase())
 
+    const passwordSection = document.getElementById("passwordSection");
     const contentDiv = document.getElementById("content");
     const editor = document.getElementById("editor");
     const saveBtn = document.getElementById("saveBtn");
     const notice = document.getElementById("notice");
+    const errorMsg = document.getElementById("errorMsg");
 
-    if (isAdmin) {
-      editor.style.display = "block";
-      saveBtn.style.display = "inline-block";
-      editor.value = contentDiv.innerText;
-      notice.innerText = "⚠️ Your changes are only saved after re-uploading the downloaded file.";
-    }
+    document.getElementById("enterBtn").addEventListener("click", () => {
+      const enteredPassword = document.getElementById("passwordInput").value;
+
+      if (enteredPassword.toLowerCase() === editPassword.toLowerCase()) {
+        // Unlock admin mode
+        passwordSection.style.display = "none";
+        editor.style.display = "block";
+        saveBtn.style.display = "inline-block";
+        editor.value = contentDiv.innerText;
+        notice.innerText = "⚠️ Your changes are only saved after re-uploading the downloaded file.";
+      } else {
+        errorMsg.innerText = "❌ Wrong password. Try again.";
+      }
+    });
 
     function saveText() {
       const newText = editor.value;
       contentDiv.innerText = newText;
 
-      // Get current HTML
+      // Replace old content in HTML
       let html = document.documentElement.outerHTML;
-      // Replace old text with new text in HTML
-      html = html.replace(/<div id=\"content\">[\\s\\S]*?<\\/div>/, `<div id="content">${newText}</div>`);
+      html = html.replace(/<div id="content">[\\s\\S]*?<\\/div>/, `<div id="content">${newText}</div>`);
 
-      // Create a blob of the new HTML
+      // Create a blob and trigger download
       const blob = new Blob([html], { type: "text/html" });
       const url = URL.createObjectURL(blob);
-
-      // Create a link to download
       const a = document.createElement("a");
       a.href = url;
       a.download = "index.html";
