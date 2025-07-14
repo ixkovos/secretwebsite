@@ -21,8 +21,8 @@
     h1, h2 {
       margin-bottom: 20px;
     }
-    #content, #editor, #saveBtn, #notice {
-      display: none;
+    #title, #content, #editor, #saveBtn, #notice {
+      display: none; /* hide all until password is correct */
     }
     #editor {
       width: 90%;
@@ -91,8 +91,8 @@
         contentDiv.style.display = "block";
         editor.style.display = "block";
         saveBtn.style.display = "inline-block";
-        editor.value = contentDiv.innerText;
         notice.style.display = "block";
+        editor.value = contentDiv.innerText;
         notice.innerText = "⚠️ Your changes are only saved after re-uploading the downloaded file.";
       } else {
         errorMsg.innerText = "❌ Wrong password. Try again.";
@@ -122,7 +122,5 @@
     }
   </script>
 </body>
-</html>
-
 </html>
 
