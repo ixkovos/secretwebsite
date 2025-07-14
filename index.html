@@ -60,6 +60,7 @@
 <body>
   <div id="loginSection">
     <h2>Enter Password</h2>
+    <label for="passwordInput">Password:</label>
     <input type="password" id="passwordInput" placeholder="Enter password" />
     <span id="togglePassword">👁️</span>
     <button id="loginBtn">Enter</button>
@@ -97,13 +98,16 @@
         togglePassword.textContent = passwordInput.type === "password" ? "👁️" : "🙈";
       });
 
-      // Unlock admin
+      // Unlock admin mode
       function unlockAdmin() {
         const entered = passwordInput.value.trim();
-        if (entered.toLowerCase() === correctPassword.toLowerCase()) {
+        if (entered === correctPassword) {
           loginSection.style.display = "none";
-          mainContent.style.display = "block";
-          editor.value = displayText.innerText;
+          mainContent.style.display = "flex"; // maintain flex layout
+          editor.style.display = "block";
+          saveBtn.style.display = "inline-block";
+          notice.style.display = "block";
+          editor.value = displayText.innerHTML; // preserve line breaks
           notice.innerText = "⚠️ Changes only saved after re-uploading the downloaded file.";
         } else {
           errorMsg.textContent = "❌ Wrong password. Try again.";
@@ -119,10 +123,22 @@
       // Save & download updated HTML
       saveBtn.addEventListener("click", () => {
         const newText = editor.value;
-        displayText.innerText = newText;
+
+        // Escape HTML entities
+        const escapedText = newText
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+
+        displayText.innerHTML = escapedText;
 
         let html = document.documentElement.outerHTML;
-        html = html.replace(/<div id="displayText">[\\s\\S]*?<\\/div>/, `<div id="displayText">${newText}</div>`);
+        html = html.replace(
+          /<div id="displayText">[\s\S]*?<\/div>/,
+          `<div id="displayText">${escapedText}</div>`
+        );
 
         const blob = new Blob([html], { type: "text/html" });
         const url = URL.createObjectURL(blob);
