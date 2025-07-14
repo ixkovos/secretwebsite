@@ -22,7 +22,7 @@
       margin-bottom: 20px;
     }
     #title, #content, #editor, #saveBtn, #notice {
-      display: none; /* hide all until password is correct */
+      display: none;
     }
     #editor {
       width: 90%;
@@ -50,18 +50,22 @@
       color: red;
       margin-top: 10px;
     }
+    #togglePassword {
+      margin-left: 5px;
+      cursor: pointer;
+      color: #ccc;
+    }
   </style>
 </head>
 <body>
-  <!-- Password Section -->
   <div id="passwordSection">
     <h2>Enter Password</h2>
     <input type="password" id="passwordInput" placeholder="Enter password" />
+    <span id="togglePassword">👁️</span>
     <button id="enterBtn">Enter</button>
     <p id="errorMsg"></p>
   </div>
 
-  <!-- Hidden Content -->
   <h1 id="title">The Words of the Tattoo</h1>
   <div id="content">
     This is the initial tattoo text. Tattoo guy can change it in admin mode.
@@ -80,12 +84,12 @@
     const saveBtn = document.getElementById("saveBtn");
     const notice = document.getElementById("notice");
     const errorMsg = document.getElementById("errorMsg");
+    const passwordInput = document.getElementById("passwordInput");
+    const togglePassword = document.getElementById("togglePassword");
 
-    document.getElementById("enterBtn").addEventListener("click", () => {
-      const enteredPassword = document.getElementById("passwordInput").value;
-
+    function unlockAdmin() {
+      const enteredPassword = passwordInput.value.trim();
       if (enteredPassword.toLowerCase() === editPassword.toLowerCase()) {
-        // Unlock admin mode
         passwordSection.style.display = "none";
         title.style.display = "block";
         contentDiv.style.display = "block";
@@ -93,9 +97,30 @@
         saveBtn.style.display = "inline-block";
         notice.style.display = "block";
         editor.value = contentDiv.innerText;
-        notice.innerText = "⚠️ Your changes are only saved after re-uploading the downloaded file.";
+        notice.innerText = "⚠️ Changes are only saved after re-uploading the downloaded file.";
       } else {
         errorMsg.innerText = "❌ Wrong password. Try again.";
+      }
+    }
+
+    // Unlock on button click
+    document.getElementById("enterBtn").addEventListener("click", unlockAdmin);
+
+    // Unlock on Enter key press
+    passwordInput.addEventListener("keypress", function(event) {
+      if (event.key === "Enter") {
+        unlockAdmin();
+      }
+    });
+
+    // Toggle password visibility
+    togglePassword.addEventListener("click", () => {
+      if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        togglePassword.textContent = "🙈";
+      } else {
+        passwordInput.type = "password";
+        togglePassword.textContent = "👁️";
       }
     });
 
@@ -103,11 +128,9 @@
       const newText = editor.value;
       contentDiv.innerText = newText;
 
-      // Replace old content in HTML
       let html = document.documentElement.outerHTML;
       html = html.replace(/<div id="content">[\\s\\S]*?<\\/div>/, `<div id="content">${newText}</div>`);
 
-      // Create a blob and trigger download
       const blob = new Blob([html], { type: "text/html" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
