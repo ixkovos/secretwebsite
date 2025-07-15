@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Secret Message</title>
+  <title>The Words of the Tattoo</title>
   <style>
     body {
       background: #121212;
@@ -17,10 +17,10 @@
       margin: 0;
       text-align: center;
     }
-    h1 {
+    h1, h2, h3, h4 {
       margin-bottom: 20px;
     }
-    #secretText {
+    #secretText, #adminPanel {
       display: none;
       max-width: 600px;
       font-size: 1.2em;
@@ -32,12 +32,14 @@
       flex-direction: column;
       align-items: center;
     }
-    input {
+    input, textarea {
       padding: 10px;
       font-size: 1em;
       margin-bottom: 10px;
       border-radius: 5px;
       border: none;
+      width: 90%;
+      max-width: 400px;
     }
     button {
       padding: 10px 20px;
@@ -47,6 +49,7 @@
       border: none;
       border-radius: 5px;
       cursor: pointer;
+      margin-bottom: 10px;
     }
     button:hover {
       background-color: #666;
@@ -64,23 +67,78 @@
     <button onclick="checkPassword()">Unlock</button>
     <p id="errorMsg"></p>
   </div>
+
   <div id="secretText">
     <h2>The Words of the Tattoo</h2>
-    <p>This is the secret message only revealed after entering the correct password.</p>
+    <p id="tattooMessage">
+      This is the secret message only revealed after entering the correct password.
+    </p>
+  </div>
+
+  <div id="adminPanel">
+    <h3>Admin Tools</h3>
+    <textarea id="editMessage" rows="5"></textarea><br>
+    <button onclick="saveMessage()">💾 Save Text</button><br><br>
+
+    <h4>Change Passwords</h4>
+    <input type="text" id="newViewPassword" placeholder="New View Password"><br>
+    <input type="text" id="newAdminPassword" placeholder="New Admin Password"><br>
+    <button onclick="changePasswords()">🔑 Change Passwords</button><br>
+    <button onclick="downloadFile()">📥 Download Updated File</button>
   </div>
 
   <script>
-    const correctPassword = "qrpass2025";
+    let viewPassword = "qrpass2025";
+    let adminPassword = "admin2025";
 
     function checkPassword() {
       const input = document.getElementById("passwordInput").value.trim();
-      if (input.toLowerCase() === correctPassword.toLowerCase()) {
-        document.getElementById("passwordHeading").style.display = "none";
-        document.getElementById("passwordSection").style.display = "none";
-        document.getElementById("secretText").style.display = "block";
+      if (input.toLowerCase() === viewPassword.toLowerCase()) {
+        unlockView();
+      } else if (input.toLowerCase() === adminPassword.toLowerCase()) {
+        unlockView();
+        unlockAdmin();
       } else {
         document.getElementById("errorMsg").textContent = "❌ Wrong password. Try again.";
       }
+    }
+
+    function unlockView() {
+      document.getElementById("passwordHeading").style.display = "none";
+      document.getElementById("passwordSection").style.display = "none";
+      document.getElementById("secretText").style.display = "block";
+    }
+
+    function unlockAdmin() {
+      document.getElementById("adminPanel").style.display = "block";
+      document.getElementById("editMessage").value = document.getElementById("tattooMessage").innerText;
+    }
+
+    function saveMessage() {
+      const newText = document.getElementById("editMessage").value;
+      document.getElementById("tattooMessage").innerText = newText;
+      alert("✅ Text updated (temporary). Download file to save permanently.");
+    }
+
+    function changePasswords() {
+      const newView = document.getElementById("newViewPassword").value.trim();
+      const newAdmin = document.getElementById("newAdminPassword").value.trim();
+      if (newView) viewPassword = newView;
+      if (newAdmin) adminPassword = newAdmin;
+      alert("✅ Passwords updated (temporary). Download file to save permanently.");
+    }
+
+    function downloadFile() {
+      let html = document.documentElement.outerHTML;
+      const blob = new Blob([html], { type: "text/html" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "index.html";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     }
   </script>
 </body>
