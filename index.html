@@ -3,141 +3,85 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>The Words of the Tattoo</title>
+  <title>Secret Message</title>
   <style>
     body {
-      background: #111;
-      color: #eee;
+      background: #121212;
+      color: #ffffff;
       font-family: Arial, sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
+      height: 100vh;
       margin: 0;
-      padding: 20px;
       text-align: center;
     }
-    h1, h2 {
+    h1 {
       margin-bottom: 20px;
     }
-    #mainContent, #editor, #saveBtn, #notice {
+    #secretText {
       display: none;
-    }
-    #editor {
-      width: 90%;
       max-width: 600px;
-      height: 200px;
+      font-size: 1.2em;
+      line-height: 1.5;
+      margin-top: 20px;
+    }
+    #passwordSection {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    input {
+      padding: 10px;
+      font-size: 1em;
       margin-bottom: 10px;
+      border-radius: 5px;
+      border: none;
     }
     button {
       padding: 10px 20px;
       font-size: 1em;
-      background: #444;
+      background-color: #444;
       color: #fff;
       border: none;
       border-radius: 5px;
       cursor: pointer;
     }
     button:hover {
-      background: #666;
-    }
-    #notice {
-      margin-top: 15px;
-      color: #ffcc00;
+      background-color: #666;
     }
     #errorMsg {
       color: red;
       margin-top: 10px;
     }
-    #togglePassword {
-      margin-left: 5px;
-      cursor: pointer;
-      color: #ccc;
-    }
   </style>
 </head>
 <body>
-  <div id="loginSection">
-    <h2>Enter Password</h2>
-    <input type="password" id="passwordInput" placeholder="Enter password" />
-    <span id="togglePassword">👁️</span>
-    <button id="loginBtn">Enter</button>
+  <h1 id="passwordHeading">Enter Password</h1>
+  <div id="passwordSection">
+    <input type="password" id="passwordInput" placeholder="Password">
+    <button onclick="checkPassword()">Unlock</button>
     <p id="errorMsg"></p>
   </div>
-
-  <div id="mainContent">
-    <h1>The Words of the Tattoo</h1>
-    <div id="displayText">
-      This is the initial tattoo text. Tattoo guy can change it in admin mode.
-    </div>
-    <textarea id="editor"></textarea>
-    <button id="saveBtn">Save & Download</button>
-    <p id="notice"></p>
+  <div id="secretText">
+    <h2>The Words of the Tattoo</h2>
+    <p>This is the secret message only revealed after entering the correct password.</p>
   </div>
 
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const correctPassword = "qrpass2025";
+    const correctPassword = "qrpass2025";
 
-      const loginSection = document.getElementById("loginSection");
-      const mainContent = document.getElementById("mainContent");
-      const passwordInput = document.getElementById("passwordInput");
-      const togglePassword = document.getElementById("togglePassword");
-      const loginBtn = document.getElementById("loginBtn");
-      const errorMsg = document.getElementById("errorMsg");
-      const displayText = document.getElementById("displayText");
-      const editor = document.getElementById("editor");
-      const saveBtn = document.getElementById("saveBtn");
-      const notice = document.getElementById("notice");
-
-      // Toggle password visibility
-      togglePassword.addEventListener("click", () => {
-        passwordInput.type = passwordInput.type === "password" ? "text" : "password";
-        togglePassword.textContent = passwordInput.type === "password" ? "👁️" : "🙈";
-      });
-
-      // Unlock admin
-      function unlockAdmin() {
-        const entered = passwordInput.value.trim();
-        if (entered.toLowerCase() === correctPassword.toLowerCase()) {
-          loginSection.style.display = "none";
-          mainContent.style.display = "block";
-          editor.value = displayText.innerText;
-          notice.innerText = "⚠️ Changes only saved after re-uploading the downloaded file.";
-        } else {
-          errorMsg.textContent = "❌ Wrong password. Try again.";
-        }
+    function checkPassword() {
+      const input = document.getElementById("passwordInput").value.trim();
+      if (input.toLowerCase() === correctPassword.toLowerCase()) {
+        document.getElementById("passwordHeading").style.display = "none";
+        document.getElementById("passwordSection").style.display = "none";
+        document.getElementById("secretText").style.display = "block";
+      } else {
+        document.getElementById("errorMsg").textContent = "❌ Wrong password. Try again.";
       }
-
-      // Enter key or button click unlocks
-      loginBtn.addEventListener("click", unlockAdmin);
-      passwordInput.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") unlockAdmin();
-      });
-
-      // Save & download updated HTML
-      saveBtn.addEventListener("click", () => {
-        const newText = editor.value;
-        displayText.innerText = newText;
-
-        let html = document.documentElement.outerHTML;
-        html = html.replace(/<div id="displayText">[\\s\\S]*?<\\/div>/, `<div id="displayText">${newText}</div>`);
-
-        const blob = new Blob([html], { type: "text/html" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "index.html";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-
-        alert("✅ Downloaded! Upload to GitHub to make it live.");
-      });
-    });
+    }
   </script>
 </body>
 </html>
-
