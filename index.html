@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>The Words of the Tattoo</title>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
   <style>
     body {
       background: #121212;
@@ -13,7 +15,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 100vh;
+      min-height: 100vh;
       margin: 0;
       text-align: center;
     }
@@ -70,9 +72,7 @@
 
   <div id="secretText">
     <h2>The Words of the Tattoo</h2>
-    <p id="tattooMessage">
-      This is the secret message only revealed after entering the correct password.
-    </p>
+    <p id="tattooMessage">Loading...</p>
   </div>
 
   <div id="adminPanel">
@@ -83,13 +83,34 @@
     <h4>Change Passwords</h4>
     <input type="text" id="newViewPassword" placeholder="New View Password"><br>
     <input type="text" id="newAdminPassword" placeholder="New Admin Password"><br>
-    <button onclick="changePasswords()">🔑 Change Passwords</button><br>
-    <button onclick="downloadFile()">📥 Download Updated File</button>
+    <button onclick="changePasswords()">🔑 Change Passwords</button>
   </div>
 
   <script>
-    let viewPassword = "qrpass2025";
-    let adminPassword = "admin2025";
+    // 🔥 Firebase Config
+    const firebaseConfig = {
+  apiKey: "AIzaSyAOTNM4_XKMHjI5Kz8GNXfGswr9RmVPzVY",
+  authDomain: "website-a33dc.firebaseapp.com",
+  projectId: "website-a33dc",
+  storageBucket: "website-a33dc.appspot.com",
+  messagingSenderId: "43083852290",
+  appId: "1:43083852290:web:14e618ee7a876161f2d51b",
+  measurementId: "G-MCFPSHXJQ6"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    let viewPassword = "";
+    let adminPassword = "";
+
+    // Load data from Firebase
+    db.ref().on("value", snapshot => {
+      const data = snapshot.val();
+      viewPassword = data.viewPassword;
+      adminPassword = data.adminPassword;
+      document.getElementById("tattooMessage").innerText = data.message;
+    });
 
     function checkPassword() {
       const input = document.getElementById("passwordInput").value.trim().toLowerCase();
@@ -116,31 +137,17 @@
 
     function saveMessage() {
       const newText = document.getElementById("editMessage").value;
-      document.getElementById("tattooMessage").innerText = newText;
-      alert("✅ Text updated (temporary). Download file to save permanently.");
+      db.ref().update({ message: newText });
+      alert("✅ Text updated live!");
     }
 
     function changePasswords() {
       const newView = document.getElementById("newViewPassword").value.trim();
       const newAdmin = document.getElementById("newAdminPassword").value.trim();
-      if (newView) viewPassword = newView;
-      if (newAdmin) adminPassword = newAdmin;
-      alert("✅ Passwords updated (temporary). Download file to save permanently.");
-    }
-
-    function downloadFile() {
-      let html = document.documentElement.outerHTML;
-      const blob = new Blob([html], { type: "text/html" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "index.html";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      if (newView) db.ref().update({ viewPassword: newView });
+      if (newAdmin) db.ref().update({ adminPassword: newAdmin });
+      alert("✅ Passwords updated live!");
     }
   </script>
 </body>
 </html>
-
