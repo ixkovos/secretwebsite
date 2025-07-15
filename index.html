@@ -60,6 +60,10 @@
       color: red;
       margin-top: 10px;
     }
+    #loading {
+      margin-top: 15px;
+      color: #f39c12;
+    }
   </style>
 </head>
 <body>
@@ -68,6 +72,7 @@
     <input type="password" id="passwordInput" placeholder="Password">
     <button onclick="checkPassword()">Unlock</button>
     <p id="errorMsg"></p>
+    <p id="loading">⏳ Loading Firebase data…</p>
   </div>
 
   <div id="secretText">
@@ -91,11 +96,11 @@
     const firebaseConfig = {
       apiKey: "AIzaSyAOTNM4_XKMHjI5Kz8GNXfGswr9RmVPzVY",
       authDomain: "website-a33dc.firebaseapp.com",
+      databaseURL: "https://website-a33dc-default-rtdb.asia-southeast1.firebasedatabase.app",
       projectId: "website-a33dc",
       storageBucket: "website-a33dc.appspot.com",
       messagingSenderId: "43083852290",
-      appId: "1:43083852290:web:14e618ee7a876161f2d51b",
-      measurementId: "G-MCFPSHXJQ6"
+      appId: "1:43083852290:web:14e618ee7a876161f2d51b"
     };
 
     firebase.initializeApp(firebaseConfig);
@@ -103,20 +108,33 @@
 
     let viewPassword = "";
     let adminPassword = "";
-    let firebaseReady = false;
+    let firebaseLoaded = false;
 
     // Load data from Firebase
     db.ref().on("value", snapshot => {
-      const data = snapshot.val();
-      viewPassword = data.viewPassword;
-      adminPassword = data.adminPassword;
-      document.getElementById("tattooMessage").innerText = data.message;
-      firebaseReady = true; // ✅ Data is now loaded
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        viewPassword = data.viewPassword;
+        adminPassword = data.adminPassword;
+        document.getElementById("tattooMessage").innerText = data.message;
+        document.getElementById("loading").style.display = "none";
+        firebaseLoaded = true;
+      } else {
+        document.getElementById("errorMsg").innerHTML = "⚠️ No data found in Firebase.";
+      }
     });
 
+    // Timeout Fallback (5 seconds)
+    setTimeout(() => {
+      if (!firebaseLoaded) {
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("errorMsg").innerHTML = "❌ Could not load Firebase data. <br><button onclick='location.reload()'>🔄 Retry</button>";
+      }
+    }, 5000);
+
     function checkPassword() {
-      if (!firebaseReady) {
-        document.getElementById("errorMsg").textContent = "⏳ Please wait... loading data.";
+      if (!firebaseLoaded) {
+        document.getElementById("errorMsg").textContent = "⏳ Please wait… loading data.";
         return;
       }
 
@@ -158,4 +176,3 @@
   </script>
 </body>
 </html>
-
